@@ -16,20 +16,20 @@ int main()
 	MPI_Comm_size(MPI_COMM_WORLD,&size);
 	//============
 	srand(time(0)+rank*10);
-	mat2 (*Hp)(double) = &H2;
+	mat2 (*Hp)(double) = &H1;
 	double m=2000.0;
 	double x0 = -10;
 	double dTe = 1/0.05/60;
 	int num_iter = 600;
 	int num_k = 60;
-	double E_min = exp(-4), E_max = exp(1);
+	double k_min = 1, k_max = 30;
 	mat2 rho0;
 
 	rho0[0]=1;rho0[1]=0;rho0[2]=0;rho0[3]=0;
 
 	for (int tk=0; tk<num_k; tk++)
 	{
-		double kk=sqrt(2*m*E_min*pow(E_max/E_min,tk/(double)(num_k-1)));
+		double kk=k_min + (k_max-k_min)/(num_k-1)*tk;
 		double v0 = kk/m;
 		double dTa = 1/v0/40;
 		int atom_time_scale = (int)(dTa/dTe);
@@ -84,7 +84,7 @@ int main()
 		MPI_Allreduce(&trans2,&btrans2,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 		MPI_Allreduce(&reflect1,&breflect1,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 		if (rank == 0)
-			cout<<log(kk*kk/2/m)<<'\t'<<btrans1/num_iter/size<<'\t'<<btrans2/num_iter/size<<'\t'<<breflect1/num_iter/size<<endl;
+			cout<<kk<<'\t'<<btrans1/num_iter/size<<'\t'<<btrans2/num_iter/size<<'\t'<<breflect1/num_iter/size<<endl;
 	}
 
 	MPI_Finalize();

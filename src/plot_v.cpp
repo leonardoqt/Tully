@@ -7,7 +7,7 @@ using namespace std;
 
 int main()
 {
-	mat2 (*Hp)(double)=&H2;
+	mat2 (*Hp)(double)=&H1;
 	mat2 vec,val;
 	for (double x=-10; x<=10; x+=0.1)
 	{
