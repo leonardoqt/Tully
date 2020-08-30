@@ -16,20 +16,20 @@ int main()
 	MPI_Comm_size(MPI_COMM_WORLD,&size);
 	//============
 	srand(time(0)+rank*10);
-	mat2 (*Hp)(double) = &H2;
+	mat2 (*Hp)(double) = &H3;
 	double m=2000.0;
 	double x0 = -10;
-	double dTe = 1/0.05/80;
-	int num_iter = 600;
-	int num_k = 60;
-	double E_min = exp(-4), E_max = exp(1);
+	double dTe = 1/0.20/80;
+	int num_iter = 500;
+	int num_k = 200;
+	double k_min = 5, k_max = 35;
 	mat2 rho0;
 
 	rho0[0]=1;rho0[1]=0;rho0[2]=0;rho0[3]=0;
 
 	for (int tk=0; tk<num_k; tk++)
 	{
-		double kk=sqrt(2*m*E_min*pow(E_max/E_min,tk/(double)(num_k-1)));
+		double kk=k_min + (k_max-k_min)/(num_k-1)*tk;
 		double v0 = kk/m;
 		double dTa = 1/v0/40;
 		int atom_time_scale = (int)(dTa/dTe);
@@ -38,8 +38,8 @@ int main()
 			cout<<"Error, atomic time scale too small"<<endl;
 			exit(EXIT_FAILURE);
 		}
-		double trans1=0,trans2=0,reflect1=0;
-		double btrans1=0,btrans2=0,breflect1=0;
+		double trans1=0,trans2=0,reflect1=0,reflect2=0;
+		double btrans1=0,btrans2=0,breflect1=0,breflect2=0;
 		for (int t1=0; t1<num_iter; t1++)
 		{
 			double xx = x0 + (rand()/(double)RAND_MAX)*2-1;
@@ -56,7 +56,7 @@ int main()
 				// do atomic step
 				if (count%atom_time_scale == 0)
 				{
-					x_v_rk4(dTa,xx,vv,m,s,Hp);
+					x_v_rk4(dTe*atom_time_scale,xx,vv,m,s,Hp);
 					Hp(xx).eig(Vec,Ene);
 					Dir = DD(xx,Hp);
 				}
@@ -73,18 +73,27 @@ int main()
 				}
 				count++;
 			}
-			if(xx < 0 && s == 0)
-				reflect1++;
-			else if(s == 0)
-				trans1++;
+			if(xx < 0)
+			{
+				if(s==0)
+					reflect1++;
+				else
+					reflect2++;
+			}
 			else
-				trans2++;
+			{
+				if(s==0)
+					trans1++;
+				else
+					trans2++;
+			}
 		}
 		MPI_Allreduce(&trans1,&btrans1,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 		MPI_Allreduce(&trans2,&btrans2,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 		MPI_Allreduce(&reflect1,&breflect1,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+		MPI_Allreduce(&reflect2,&breflect2,1,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
 		if (rank == 0)
-			cout<<log(kk*kk/2/m)<<'\t'<<btrans1/num_iter/size<<'\t'<<btrans2/num_iter/size<<'\t'<<breflect1/num_iter/size<<endl;
+			cout<<kk<<'\t'<<btrans1/num_iter/size<<'\t'<<breflect1/num_iter/size<<'\t'<<breflect2/num_iter/size<<endl;
 	}
 
 	MPI_Finalize();
