@@ -19,9 +19,9 @@ int main()
 	mat2 (*Hp)(double) = &H2;
 	double m=2000.0;
 	double x0 = -10;
-	double dTe = 1/0.05/80;
-	int num_iter = 600;
-	int num_k = 60;
+	double dTe = 1/0.20/80;
+	int num_iter = 500;
+	int num_k = 200;
 	double E_min = exp(-4), E_max = exp(1);
 	mat2 rho0;
 
@@ -56,7 +56,7 @@ int main()
 				// do atomic step
 				if (count%atom_time_scale == 0)
 				{
-					x_v_rk4(dTa,xx,vv,m,s,Hp);
+					x_v_rk4(dTe*atom_time_scale,xx,vv,m,s,Hp);
 					Hp(xx).eig(Vec,Ene);
 					Dir = DD(xx,Hp);
 				}
