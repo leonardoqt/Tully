@@ -12,7 +12,7 @@ SRC   = $(shell ls $(SDIR)/*.cpp)
 TOBJ  = $(ODIR)/main.o $(ODIR)/mat2.o
 POBJ  = $(ODIR)/plot_v.o $(ODIR)/mat2.o
 
-tully.x : $(TOBJ)
+tully2.x : $(TOBJ)
 	$(CXX) -o $@ $^ $(CFLAG)
 pot.x : $(POBJ)
 	$(CXX) -o $@ $^ $(CFLAG)

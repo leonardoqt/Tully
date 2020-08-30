@@ -19,7 +19,7 @@ int main()
 	mat2 (*Hp)(double) = &H2;
 	double m=2000.0;
 	double x0 = -10;
-	double dTe = 1/0.05/60;
+	double dTe = 1/0.05/80;
 	int num_iter = 600;
 	int num_k = 60;
 	double E_min = exp(-4), E_max = exp(1);
