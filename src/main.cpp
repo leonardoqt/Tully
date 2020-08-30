@@ -19,8 +19,8 @@ int main()
 	mat2 (*Hp)(double) = &H2;
 	double m=2000.0;
 	double x0 = -10;
-	double dTe = 1/0.20/80;
-	int num_iter = 500;
+	double dTe = 1/0.20/30;
+	int num_iter = 100;
 	int num_k = 200;
 	double E_min = exp(-4), E_max = exp(1);
 	mat2 rho0;
@@ -31,7 +31,7 @@ int main()
 	{
 		double kk=sqrt(2*m*E_min*pow(E_max/E_min,tk/(double)(num_k-1)));
 		double v0 = kk/m;
-		double dTa = 1/v0/40;
+		double dTa = 1/v0/10;
 		int atom_time_scale = (int)(dTa/dTe);
 		if (atom_time_scale == 0)
 		{
